@@ -52,7 +52,12 @@ def train_dqn(steps=1000000, render_interval=1000):
         
         # 每个智能体学习（但不在学习中衰减epsilon）
         for i in range(4):
-            agents[i].learn(obs[i], actions[i], rewards[i], next_obs[i])
+            # 获取观察，确保是numpy数组且形状正确
+            state = np.array(obs[i], dtype=np.float32)
+            next_state = np.array(next_obs[i], dtype=np.float32)
+            
+            # 学习
+            agents[i].learn(state, actions[i], rewards[i], next_state)
         
         # 衰减探索率（每个回合只衰减一次）
         epsilon = max(epsilon_min, epsilon * epsilon_decay)

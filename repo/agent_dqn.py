@@ -67,6 +67,10 @@ class DQNAgent:
         if isinstance(state, tuple):
             state = np.array(state, dtype=np.float32)
         
+        # 确保形状正确 [1, state_size]
+        if state.ndim == 1:
+            state = state.reshape(1, -1)
+        
         # 利用：选择Q值最大的动作
         q_values = get_qvals(state)
         # 确保q_values是numpy数组
@@ -79,6 +83,18 @@ class DQNAgent:
         单步学习（类似于QTableAgent接口）
         实际实现中，这个方法会记住经验并在条件满足时批量学习
         """
+        # 确保状态是numpy数组
+        if isinstance(s, tuple):
+            s = np.array(s, dtype=np.float32)
+        if isinstance(s2, tuple):
+            s2 = np.array(s2, dtype=np.float32)
+        
+        # 确保形状正确 [1, state_size]
+        if s.ndim == 1:
+            s = s.reshape(1, -1)
+        if s2.ndim == 1:
+            s2 = s2.reshape(1, -1)
+        
         # 将经验添加到回放缓冲区
         self.remember(s, a, r, s2)
         
@@ -97,11 +113,17 @@ class DQNAgent:
         targets = []
         
         for state, action, reward, next_state in minibatch:
-            # 将tuple转换为numpy数组
+            # 确保状态是numpy数组且形状正确
             if isinstance(state, tuple):
                 state = np.array(state, dtype=np.float32)
             if isinstance(next_state, tuple):
                 next_state = np.array(next_state, dtype=np.float32)
+            
+            # 确保状态是二维数组 [1, state_size]
+            if state.ndim == 1:
+                state = state.reshape(1, -1)
+            if next_state.ndim == 1:
+                next_state = next_state.reshape(1, -1)
             
             # 计算TD目标
             td_target = reward + self.gamma * get_maxQ(next_state)
